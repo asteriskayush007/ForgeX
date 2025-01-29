@@ -223,22 +223,29 @@ var createCmd = &cobra.Command{
 		}
 
 		if project.GitOptions == "" {
-    			isInteractive = true
-    			step := steps.Steps["git"]
-    			tprogram := tea.NewProgram(multiInput.InitialModelMulti(step.Options, options.Git, step.Headers, project))
+    isInteractive = true
+    step := steps.Steps["git"]
+    
+    // Create a new program instance for interaction
+    tprogram := tea.NewProgram(multiInput.InitialModelMulti(step.Options, options.Git, step.Headers, project))
 
-    		if _, err := tprogram.Run(); err != nil {
-        		cobra.CheckErr(textinput.CreateErrorInputModel(err).Err())
-    		}
+    // Run the program and handle any errors
+    if _, err := tprogram.Run(); err != nil {
+        // Handle error using cobra and provide a clear error message
+        cobra.CheckErr(textinput.CreateErrorInputModel(err).Err())
+    }
 
-    		project.ExitCLI(tprogram)
+    // Exit the CLI after the interaction completes
+    project.ExitCLI(tprogram)
 
-    		// Set the Git option and handle potential errors
-    		project.GitOptions = flags.Git(strings.ToLower(options.Git.Choice))
-    		if err := cmd.Flag("git").Value.Set(project.GitOptions.String()); err != nil {
-        		log.Fatal("failed to set the git flag value", err)
-    			}
-		}
+    // Set the Git option from the user input and handle errors
+    project.GitOptions = flags.Git(strings.ToLower(options.Git.Choice))
+
+    // Ensure the git flag value is set correctly
+    if err := cmd.Flag("git").Value.Set(project.GitOptions.String()); err != nil {
+        log.Fatalf("failed to set the git flag value: %v", err)
+    }
+}
 
 
 		
